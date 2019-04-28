@@ -5,7 +5,7 @@ You can edit this file as you like.
 { name =
     "my-project"
 , dependencies =
-    [ "console", "effect", "httpure", "simple-json" ]
+    [ "console", "effect", "httpure", "node-sqlite3", "simple-json" ]
 , packages =
     ./packages.dhall
 }

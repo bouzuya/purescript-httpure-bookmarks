@@ -23,5 +23,8 @@
     "spago": "spago",
     "start": "spago run",
     "test": "spago test"
+  },
+  "dependencies": {
+    "sqlite3": "^4.0.6"
   }
 }
