@@ -19,7 +19,9 @@
     "url": "git+https://github.com/bouzuya/purescript-httpure-bookmarks.git"
   },
   "scripts": {
+    "build": "spago build",
     "spago": "spago",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "spago run",
+    "test": "spago test"
   }
 }
