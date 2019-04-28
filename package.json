@@ -1,0 +1,25 @@
+{
+  "name": "purescript-httpure-bookmarks",
+  "description": "[bouzuya/w010][] 2019-W17",
+  "version": "0.0.0",
+  "author": "bouzuya <m@bouzuya.net> (https://bouzuya.net/)",
+  "bugs": {
+    "url": "https://github.com/bouzuya/purescript-httpure-bookmarks/issues"
+  },
+  "devDependencies": {
+    "purescript": "^0.12.5",
+    "spago": "^0.7.5"
+  },
+  "homepage": "https://github.com/bouzuya/purescript-httpure-bookmarks#readme",
+  "keywords": [],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bouzuya/purescript-httpure-bookmarks.git"
+  },
+  "scripts": {
+    "spago": "spago",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
