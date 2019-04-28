@@ -3,12 +3,12 @@ module Type
   , Bookmark
   ) where
 
-import Effect.Ref (Ref)
+import Data.Maybe (Maybe)
 
-type DB = Ref (Array Bookmark)
+type DB = String
 
 type Bookmark =
   { id :: String
   , url :: String
-  , comment :: String
+  , comment :: Maybe String
   }

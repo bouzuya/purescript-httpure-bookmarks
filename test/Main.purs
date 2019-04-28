@@ -23,6 +23,7 @@ type Bookmark =
   , url :: String
   , comment :: Maybe String
   }
+
 createTable :: String
 createTable =
   String.joinWith
