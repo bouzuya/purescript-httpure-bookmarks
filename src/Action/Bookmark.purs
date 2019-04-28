@@ -10,13 +10,13 @@ import Prelude
 
 import Data.Maybe as Maybe
 import HTTPure as HTTPure
-import Model as Model
+import Model.Bookmark as BookmarkModel
 import Simple.JSON as SimpleJSON
 import Type (DB, Bookmark)
 
 index :: DB -> HTTPure.ResponseM
 index db = do
-  bookmarks <- Model.bookmarkIndex db
+  bookmarks <- BookmarkModel.index db
   HTTPure.ok (SimpleJSON.writeJSON bookmarks)
 
 create :: DB -> String -> HTTPure.ResponseM
@@ -24,14 +24,14 @@ create db body = do
   case SimpleJSON.readJSON_ body :: _ Bookmark of
     Maybe.Nothing -> HTTPure.badRequest body
     Maybe.Just bookmark -> do
-      created <- Model.bookmarkCreate db bookmark
+      created <- BookmarkModel.create db bookmark
       if Maybe.isJust created
         then HTTPure.ok (SimpleJSON.writeJSON bookmark)
         else HTTPure.badRequest body
 
 show :: DB -> String -> HTTPure.ResponseM
 show db id = do
-  bookmarkMaybe <- Model.bookmarkShow db id
+  bookmarkMaybe <- BookmarkModel.show db id
   case bookmarkMaybe of
     Maybe.Nothing -> HTTPure.notFound
     Maybe.Just bookmark -> HTTPure.ok (SimpleJSON.writeJSON bookmark)
@@ -41,14 +41,14 @@ update db id body = do
   case SimpleJSON.readJSON_ body :: _ Bookmark of
     Maybe.Nothing -> HTTPure.badRequest body
     Maybe.Just bookmark -> do
-      updated <- Model.bookmarkUpdate db id bookmark
+      updated <- BookmarkModel.update db id bookmark
       if Maybe.isJust updated
         then HTTPure.ok (SimpleJSON.writeJSON bookmark)
         else HTTPure.notFound
 
 destroy :: DB -> String -> HTTPure.ResponseM
 destroy db id = do
-  deleted <- Model.bookmarkDestroy db id
+  deleted <- BookmarkModel.destroy db id
   if deleted
     then HTTPure.noContent
     else HTTPure.notFound
