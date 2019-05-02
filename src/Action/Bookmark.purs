@@ -13,11 +13,13 @@ import HTTPure as HTTPure
 import Model.Bookmark as BookmarkModel
 import Simple.JSON as SimpleJSON
 import Type (DB, Bookmark)
+import View.BookmarkIndex as ViewBookmarkIndex
+import View.BookmarkShow as ViewBookmarkShow
 
 index :: DB -> HTTPure.ResponseM
 index db = do
   bookmarks <- BookmarkModel.index db
-  HTTPure.ok (SimpleJSON.writeJSON bookmarks)
+  HTTPure.ok (ViewBookmarkIndex.render bookmarks)
 
 create :: DB -> String -> HTTPure.ResponseM
 create db body = do
@@ -26,7 +28,7 @@ create db body = do
     Maybe.Just bookmark -> do
       created <- BookmarkModel.create db bookmark
       if Maybe.isJust created
-        then HTTPure.ok (SimpleJSON.writeJSON bookmark)
+        then HTTPure.ok (ViewBookmarkShow.render bookmark)
         else HTTPure.badRequest body
 
 show :: DB -> String -> HTTPure.ResponseM
@@ -34,7 +36,7 @@ show db id = do
   bookmarkMaybe <- BookmarkModel.show db id
   case bookmarkMaybe of
     Maybe.Nothing -> HTTPure.notFound
-    Maybe.Just bookmark -> HTTPure.ok (SimpleJSON.writeJSON bookmark)
+    Maybe.Just bookmark -> HTTPure.ok (ViewBookmarkShow.render bookmark)
 
 update :: DB -> String -> String -> HTTPure.ResponseM
 update db id body = do
@@ -43,7 +45,7 @@ update db id body = do
     Maybe.Just bookmark -> do
       updated <- BookmarkModel.update db id bookmark
       if Maybe.isJust updated
-        then HTTPure.ok (SimpleJSON.writeJSON bookmark)
+        then HTTPure.ok (ViewBookmarkShow.render bookmark)
         else HTTPure.notFound
 
 destroy :: DB -> String -> HTTPure.ResponseM
