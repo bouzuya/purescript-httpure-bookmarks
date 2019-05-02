@@ -4,11 +4,15 @@ module Action
   , execute
   ) where
 
+import Prelude
+
 import Action.BookmarkCreate as ActionBookmarkCreate
 import Action.BookmarkDestroy as ActionBookmarkDestroy
 import Action.BookmarkIndex as ActionBookmarkIndex
 import Action.BookmarkShow as ActionBookmarkShow
 import Action.BookmarkUpdate as ActionBookmarkUpdate
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
 import HTTPure (ResponseM)
 import Type (DB, Bookmark)
 
@@ -20,6 +24,11 @@ data Action
   | BookmarkShow BookmarkId
   | BookmarkUpdate BookmarkId Bookmark
   | BookmarkDestroy BookmarkId
+
+derive instance eqAction :: Eq Action
+derive instance genericAction :: Generic Action _
+instance showAction :: Show Action where
+  show = genericShow
 
 execute :: DB -> Action -> ResponseM
 execute db =

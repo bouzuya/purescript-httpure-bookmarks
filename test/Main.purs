@@ -14,6 +14,7 @@ import Node.FS.Sync as FS
 import Partial.Unsafe as Unsafe
 import SQLite3 as SQLite3
 import Simple.JSON as SimpleJSON
+import Test.Router as Router
 import Test.Unit as TestUnit
 import Test.Unit.Assert as Assert
 import Test.Unit.Main as TestUnitMain
@@ -67,6 +68,7 @@ selectRow =
 
 main :: Effect Unit
 main = TestUnitMain.runTest do
+  Router.tests
   TestUnit.suite "SQLite3" do
     TestUnit.test "example" do
       let dbFile = "./example.sqlite"

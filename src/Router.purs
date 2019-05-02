@@ -8,6 +8,8 @@ import Prelude
 import Action (Action(..))
 import Data.Either (Either)
 import Data.Either as Either
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
 import HTTPure as HTTPure
 import Simple.JSON (class ReadForeign)
 import Simple.JSON as SimpleJSON
@@ -15,6 +17,11 @@ import Simple.JSON as SimpleJSON
 data RouteError
   = ClientError String
   | NotFound
+
+derive instance eqRouteError :: Eq RouteError
+derive instance genericRouteError :: Generic RouteError _
+instance showRouteError :: Show RouteError where
+  show = genericShow
 
 fromJSON :: forall a. ReadForeign a => String -> Either RouteError a
 fromJSON s =
