@@ -12,7 +12,7 @@ import View.BookmarkShow as ViewBookmarkShow
 
 execute :: DB -> String -> Bookmark -> HTTPure.ResponseM
 execute db id bookmark = do
-  updated <- BookmarkModel.update db id bookmark
-  if Maybe.isJust updated
-    then HTTPure.ok (ViewBookmarkShow.render bookmark)
-    else HTTPure.notFound
+  updatedMaybe <- BookmarkModel.update db id bookmark
+  case updatedMaybe of
+    Maybe.Nothing -> HTTPure.notFound
+    Maybe.Just updated -> HTTPure.ok (ViewBookmarkShow.render updated)

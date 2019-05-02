@@ -12,7 +12,7 @@ import View.BookmarkShow as ViewBookmarkShow
 
 execute :: DB -> Bookmark -> HTTPure.ResponseM
 execute db bookmark = do
-  created <- BookmarkModel.create db bookmark
-  if Maybe.isJust created
-    then HTTPure.ok (ViewBookmarkShow.render bookmark)
-    else HTTPure.badRequest "invalid" -- TODO
+  createdMaybe <- BookmarkModel.create db bookmark
+  case createdMaybe of
+    Maybe.Nothing -> HTTPure.badRequest "invalid" -- TODO
+    Maybe.Just created -> HTTPure.ok (ViewBookmarkShow.render created)
