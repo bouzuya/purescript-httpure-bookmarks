@@ -1,25 +1,38 @@
 module Router
-  ( router
+  ( RouteError(..)
+  , router
   ) where
 
-import Action.BookmarkCreate as ActionBookmarkCreate
-import Action.BookmarkDestroy as ActionBookmarkDestroy
-import Action.BookmarkIndex as ActionBookmarkIndex
-import Action.BookmarkShow as ActionBookmarkShow
-import Action.BookmarkUpdate as ActionBookmarkUpdate
-import HTTPure as HTTPure
-import Type (DB)
+import Prelude
 
-router :: DB -> HTTPure.Request -> HTTPure.ResponseM
-router db = case _ of
-  { method: HTTPure.Get, path: ["bookmarks"] } ->
-    ActionBookmarkIndex.execute db
-  { method: HTTPure.Post, path: ["bookmarks"], body } ->
-    ActionBookmarkCreate.execute db body
-  { method: HTTPure.Get, path: ["bookmarks", id] } ->
-    ActionBookmarkShow.execute db id
-  { method: HTTPure.Patch, path: ["bookmarks", id], body } ->
-    ActionBookmarkUpdate.execute db id body
+import Action (Action(..))
+import Data.Either (Either)
+import Data.Either as Either
+import HTTPure as HTTPure
+import Simple.JSON (class ReadForeign)
+import Simple.JSON as SimpleJSON
+
+data RouteError
+  = ClientError String
+  | NotFound
+
+fromJSON :: forall a. ReadForeign a => String -> Either RouteError a
+fromJSON s =
+  Either.either
+    (Either.Left <<< ClientError <<< show)
+    Either.Right
+    (SimpleJSON.readJSON s)
+
+router :: HTTPure.Request -> Either RouteError Action
+router = case _ of
+  { method: HTTPure.Get, path: ["bookmarks"] } -> pure BookmarkIndex
+  { method: HTTPure.Post, path: ["bookmarks"], body } -> do
+    user <- fromJSON body
+    pure (BookmarkCreate user)
+  { method: HTTPure.Get, path: ["bookmarks", id] } -> pure (BookmarkShow id)
+  { method: HTTPure.Patch, path: ["bookmarks", id], body } -> do
+    user <- fromJSON body
+    pure (BookmarkUpdate id user)
   { method: HTTPure.Delete, path: ["bookmarks", id] } ->
-    ActionBookmarkDestroy.execute db id
-  _ -> HTTPure.notFound
+    pure (BookmarkDestroy id)
+  _ -> Either.Left NotFound

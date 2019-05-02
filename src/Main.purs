@@ -4,6 +4,8 @@ module Main
 
 import Prelude
 
+import Action as Action
+import Data.Either as Either
 import Data.Maybe as Maybe
 import Data.String as String
 import Data.Traversable as Traversable
@@ -13,10 +15,11 @@ import Effect.Aff as Aff
 import Effect.Class as Class
 import Effect.Console as Console
 import Foreign as Foreign
+import HTTPure (Request, ResponseM)
 import HTTPure as HTTPure
 import Router as Router
 import SQLite3 as SQLite3
-import Type (Bookmark)
+import Type (Bookmark, DB)
 
 initialBookmarks :: Array Bookmark
 initialBookmarks =
@@ -28,9 +31,21 @@ initialBookmarks =
 main :: Effect Unit
 main = Aff.launchAff_ do
   _ <- createDB db
-  _ <- Class.liftEffect (HTTPure.serve port (Router.router db) booted)
+  _ <- Class.liftEffect (HTTPure.serve port (app db) booted)
   pure unit
   where
+    app :: DB -> Request -> ResponseM
+    app db' request =
+      case Router.router request of
+        Either.Right action -> Action.execute db' action
+        Either.Left (Router.ClientError _) ->
+          HTTPure.badRequest "invalid params"
+        Either.Left Router.NotFound ->
+          HTTPure.notFound
+
+    booted :: Effect Unit
+    booted = Console.log "Server now up on port 8080"
+
     createDB :: String -> Aff Unit
     createDB dbFile = do
       conn <- SQLite3.newDB dbFile
@@ -73,9 +88,6 @@ main = Aff.launchAff_ do
 
     db :: String
     db = "./main.sqlite"
-
-    booted :: Effect Unit
-    booted = Console.log "Server now up on port 8080"
 
     port :: Int
     port = 8080
