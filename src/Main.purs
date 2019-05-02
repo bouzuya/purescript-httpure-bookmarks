@@ -63,7 +63,7 @@ main = Aff.launchAff_ do
     createSeed =
       String.joinWith
         "\n"
-        [ "INSERT INTO bookmarks"
+        [ "INSERT OR IGNORE INTO bookmarks"
         , "  ( id"
         , "  , url"
         , "  , comment"
