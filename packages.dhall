@@ -109,13 +109,35 @@ let additions =
 -}
 
 let mkPackage =
-      https://raw.githubusercontent.com/purescript/package-sets/psc-0.12.3-20190330/src/mkPackage.dhall sha256:0b197efa1d397ace6eb46b243ff2d73a3da5638d8d0ac8473e8e4a8fc528cf57
+      https://raw.githubusercontent.com/purescript/package-sets/psc-0.12.5-20190508/src/mkPackage.dhall sha256:0b197efa1d397ace6eb46b243ff2d73a3da5638d8d0ac8473e8e4a8fc528cf57
 
 let upstream =
-      https://raw.githubusercontent.com/purescript/package-sets/psc-0.12.3-20190330/src/packages.dhall sha256:cb0cdde5926cfdff5bd17bb2508a85b5eee794088f253f59f884766828ba722c
+      https://raw.githubusercontent.com/purescript/package-sets/psc-0.12.5-20190508/src/packages.dhall sha256:8ef3a6d6d123e05933997426da68ef07289e1cbbdd2a844b5d10c9159deef65a
 
 let overrides = {=}
 
-let additions = {=}
+let additions =
+          {=}
+      //  { querydsl =
+              mkPackage
+              [ "prelude"
+              , "effect"
+              , "arrays"
+              , "lists"
+              , "record"
+              , "strings"
+              , "tuples"
+              , "typelevel-prelude"
+              , "either"
+              , "transformers"
+              , "node-sqlite3"
+              , "datetime"
+              , "formatters"
+              , "node-buffer"
+              , "nullable"
+              ]
+              "https://github.com/Dretch/purescript-querydsl.git"
+              "v0.7.0"
+          }
 
 in  upstream // overrides // additions

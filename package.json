@@ -6,9 +6,12 @@
   "bugs": {
     "url": "https://github.com/bouzuya/purescript-httpure-bookmarks/issues"
   },
+  "dependencies": {
+    "sqlite3": "^4.0.7"
+  },
   "devDependencies": {
     "purescript": "^0.12.5",
-    "spago": "^0.7.5"
+    "spago": "^0.7.7"
   },
   "homepage": "https://github.com/bouzuya/purescript-httpure-bookmarks#readme",
   "keywords": [],
@@ -23,8 +26,5 @@
     "spago": "spago",
     "start": "spago run",
     "test": "spago test"
-  },
-  "dependencies": {
-    "sqlite3": "^4.0.6"
   }
 }

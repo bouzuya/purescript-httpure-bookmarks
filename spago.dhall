@@ -9,6 +9,7 @@ You can edit this file as you like.
     , "effect"
     , "httpure"
     , "node-sqlite3"
+    , "querydsl"
     , "simple-json"
     , "test-unit"
     ]
