@@ -9,134 +9,75 @@ module Model.Bookmark
 import Prelude
 
 import Data.Array as Array
-import Data.Either as Either
 import Data.Maybe (Maybe)
 import Data.Maybe as Maybe
-import Data.String as String
 import Effect.Aff (Aff)
-import Effect.Aff as Aff
-import Foreign as Foreign
-import Prelude as Prelude
+import Prim.Boolean (False, True)
+import QueryDsl (Column, Table)
+import QueryDsl as QueryDsl
+import QueryDsl.Expressions ((:==))
+import QueryDsl.SQLite3 as QueryDslSQLite3
 import SQLite3 as SQLite3
-import Simple.JSON as SimpleJSON
 import Type (DB, Bookmark)
+
+bookmarks =
+  QueryDsl.makeTable "bookmarks" :: Table
+  ( id :: Column String True
+  , url :: Column String True
+  , comment :: Column (Maybe String) False
+  )
 
 delete :: DB -> String -> Aff Unit
 delete db id = do
+  let
+    b = QueryDsl.columns bookmarks
+    query = QueryDsl.deleteFrom bookmarks (b.id :== id)
   conn <- SQLite3.newDB db
-  _ <- SQLite3.queryDB conn query (map Foreign.unsafeToForeign [id])
-  SQLite3.closeDB conn
-  where
-    query =
-      String.joinWith
-        "\n"
-        [ "DELETE"
-        , "  FROM"
-        , "    bookmarks"
-        , "  WHERE"
-        , "    id = ?"
-        ]
+  _ <- QueryDslSQLite3.runQuery conn query
+  _ <- SQLite3.closeDB conn
+  pure unit
 
 findAll :: DB -> Aff (Array Bookmark)
 findAll db = do
+  let
+    query = do
+      b <- QueryDsl.from bookmarks
+      pure (QueryDsl.select { id: b.id, url: b.url, comment: b.comment })
   conn <- SQLite3.newDB db
-  rows <- map SimpleJSON.read (SQLite3.queryDB conn query [])
+  rows <- QueryDslSQLite3.runSelectManyQuery conn query
   _ <- SQLite3.closeDB conn
-  Either.either (\e -> Aff.throwError (Aff.error (Prelude.show e))) pure rows
-  where
-    query =
-      String.joinWith
-        "\n"
-        [ "SELECT"
-        , "    id"
-        , "  , url"
-        , "  , comment"
-        , "  FROM"
-        , "    bookmarks"
-        ]
+  pure rows
 
 find :: DB -> String -> Aff (Maybe Bookmark)
 find db id = do
+  let
+    query = do
+      b <- QueryDsl.from bookmarks
+      q <- pure (QueryDsl.select { id: b.id, url: b.url, comment: b.comment })
+      pure (QueryDsl.where_ q (b.id :== id))
   conn <- SQLite3.newDB db
-  rows <-
-    map
-      SimpleJSON.read
-      (SQLite3.queryDB conn query (map Foreign.unsafeToForeign [id]))
+  rows <- QueryDslSQLite3.runSelectManyQuery conn query
   _ <- SQLite3.closeDB conn
-  Either.either
-    (\e -> Aff.throwError (Aff.error (Prelude.show e)))
-    (pure <<< Array.head)
-    rows
-  where
-    query =
-      String.joinWith
-        "\n"
-        [ "SELECT"
-        , "    id"
-        , "  , url"
-        , "  , comment"
-        , "  FROM"
-        , "    bookmarks"
-        , "  WHERE"
-        , "    id = ?"
-        ]
+  pure (Array.head rows)
 
 insert :: DB -> Bookmark -> Aff Unit
 insert db bookmark = do
+  let query = QueryDsl.insertInto bookmarks bookmark
   conn <- SQLite3.newDB db
-  _ <-
-    SQLite3.queryDB
-      conn
-      query
-      (map
-        Foreign.unsafeToForeign
-        [ bookmark.id
-        , bookmark.url
-        , Maybe.fromMaybe "" bookmark.comment
-        ])
-  SQLite3.closeDB conn
-  where
-    query =
-      String.joinWith
-        "\n"
-        [ "INSERT INTO bookmarks"
-        , "  ( id"
-        , "  , url"
-        , "  , comment"
-        , "  )"
-        , "  VALUES"
-        , "  ( ?"
-        , "  , ?"
-        , "  , ?"
-        , "  )"
-        ]
+  _ <- QueryDslSQLite3.runQuery conn query
+  _ <- SQLite3.closeDB conn
+  pure unit
 
 update' :: DB -> String -> Bookmark -> Aff Unit
-update' db id bookmark = do
+update' db _ bookmark = do
+  -- assert id == bookmark.id
+  let
+    c = QueryDsl.columns bookmarks
+    query = QueryDsl.update bookmarks bookmark (c.id :== bookmark.id)
   conn <- SQLite3.newDB db
-  _ <-
-    SQLite3.queryDB
-      conn
-      query
-      (map
-        Foreign.unsafeToForeign
-        [ bookmark.url
-        , Maybe.fromMaybe "" bookmark.comment
-        , bookmark.id
-        ])
-  SQLite3.closeDB conn
-  where
-    query =
-      String.joinWith
-        "\n"
-        [ "UPDATE"
-        , "  bookmarks"
-        , "  SET"
-        , "    url = ?"
-        , "  , comment = ?"
-        , "  WHERE"
-        , "    id = ?"
-        ]
+  _ <- QueryDslSQLite3.runQuery conn query
+  _ <- SQLite3.closeDB conn
+  pure unit
 
 --
 
