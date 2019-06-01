@@ -7,11 +7,11 @@
     "url": "https://github.com/bouzuya/purescript-httpure-bookmarks/issues"
   },
   "dependencies": {
-    "sqlite3": "^4.0.7"
+    "sqlite3": "^4.0.8"
   },
   "devDependencies": {
     "purescript": "^0.12.5",
-    "spago": "^0.7.7"
+    "spago": "^0.8.1"
   },
   "homepage": "https://github.com/bouzuya/purescript-httpure-bookmarks#readme",
   "keywords": [],
